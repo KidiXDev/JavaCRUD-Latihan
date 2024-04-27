@@ -6,13 +6,14 @@ public class Connection {
 
     private java.sql.Connection connection;
     
-    private String url = "jdbc:mysql://localhost:3306/latihandb";
+    private String databaseName = "latihandb";
+    private String url = "jdbc:mysql://localhost:3306/";
     private String username = "root";
     private String password = "";
 
     public Connection() {
         try {
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(url + databaseName, username, password);
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
