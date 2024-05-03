@@ -20,7 +20,7 @@ public class DatabaseManager {
 
             var stmt = conn.createStatement();
 
-            String query = "SELECT * FROM mahasiswa";
+            String query = "SELECT * FROM r_supplier";
             var res = stmt.executeQuery(query);
 
             if (res == null) {
@@ -30,9 +30,24 @@ public class DatabaseManager {
             model.setRowCount(0); // reset row
 
             while (res.next()) {
-                int id = res.getInt("id");
+                String id = res.getString("id");
                 String nama = res.getString("nama");
-                model.addRow(new Object[]{id, nama});
+                String cp = res.getString("cp");
+                String alamat = res.getString("alamat");
+                String telp = res.getString("telp");
+                String kota = res.getString("kota");
+                String fax = res.getString("fax");
+                String email = res.getString("email");
+                String jt = res.getString("jt");
+                float disc = res.getFloat("disc");
+                float awal = res.getFloat("AWAL");
+                float hutang = res.getFloat("Hutang");
+                float bayar = res.getFloat("Bayar");
+                float akhir = res.getFloat("Akhir");
+                String tgl = res.getString("tgl");
+                String userID = res.getString("userid");
+
+                model.addRow(new Object[]{id, nama, cp, alamat, telp, kota, fax, email, jt, disc, awal, hutang, bayar, akhir, tgl, userID});
             }
 
         } catch (Exception ex) {
@@ -50,21 +65,24 @@ public class DatabaseManager {
             var selectedRow = table.getSelectedRow();
             var selectedId = model.getValueAt(selectedRow, 0);
 
-            String query = "DELETE FROM mahasiswa WHERE id = " + selectedId;
+            String query = "DELETE FROM r_supplier WHERE id = " + selectedId;
             var res = stmt.executeUpdate(query);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public void AddRow(String nama) {
+    public void AddRow(Object[] values) {
         try {
             var koneksi = new Connection();
             conn = koneksi.GetConnection();
 
-            String query = "INSERT INTO mahasiswa (nama) VALUES (?)";
+            String query = "INSERT INTO r_supplier (id,nama,cp,alamat,telp,kota,fax,email,jt,disc,AWAL,Hutang,Bayar,Akhir,tgl,userid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, nama);
+
+            for (int i = 0; i < values.length; i++) {
+                pstmt.setObject(i + 1, values[i]);
+            }
 
             int rowsAffected = pstmt.executeUpdate();
 
@@ -76,47 +94,59 @@ public class DatabaseManager {
             ex.printStackTrace();
         }
     }
-    
-    public void EditValue(int selectedID, String value){
+
+    public void EditValue(String selectedID, Object[] value) {
         try {
             var koneksi = new Connection();
             conn = koneksi.GetConnection();
 
-            var stmt = conn.createStatement();
+            String query = "UPDATE r_supplier SET id = ?, nama = ?, cp = ?, alamat = ?, telp = ?, kota = ?, fax = ?, email = ?, jt = ?, disc = ?, AWAL = ?, Hutang = ?, Bayar = ?, Akhir = ?, tgl = ?, userid = ? WHERE id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
 
-            String query = "UPDATE mahasiswa SET nama = \"" + value + "\" WHERE id = " + selectedID;
-            stmt.executeUpdate(query);
+            for (int i = 0; i < value.length; i++) {
+                pstmt.setObject(i + 1, value[i]);
+            }
+            pstmt.setString(value.length + 1, selectedID);
+
+            pstmt.executeUpdate();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public String ReadValue(int selectedID) {
+    public String[] ReadValue(String selectedID) {
         try {
             var koneksi = new Connection();
             conn = koneksi.GetConnection();
 
             var stmt = conn.createStatement();
 
-            String query = "SELECT * FROM mahasiswa WHERE id = " + selectedID;
+            String query = "SELECT * FROM r_supplier WHERE id = '" + selectedID + "'";
             var res = stmt.executeQuery(query);
 
             if (res == null) {
                 throw new NullPointerException("Table not found!");
             }
 
+            ResultSetMetaData metaData = res.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            String[] values = new String[columnCount];
+
             while (res.next()) {
-                return res.getString("nama");
+                for (int i = 1; i <= columnCount; i++) {
+                    values[i - 1] = res.getString(i);
+                }
             }
 
-            return null;
+            return values;
 
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
     }
-    
+
     public void FetchDatabaseSearchResult(DefaultTableModel model, String searchTarget) {
         try {
             var koneksi = new Connection();
@@ -124,7 +154,7 @@ public class DatabaseManager {
 
             var stmt = conn.createStatement();
 
-            String query = "SELECT * FROM mahasiswa WHERE nama LIKE '%" + searchTarget + "%'";
+            String query = "SELECT * FROM r_supplier WHERE nama LIKE '%" + searchTarget + "%'";
             var res = stmt.executeQuery(query);
 
             if (res == null) {
@@ -134,9 +164,24 @@ public class DatabaseManager {
             model.setRowCount(0); // reset row
 
             while (res.next()) {
-                int id = res.getInt("id");
+                String id = res.getString("id");
                 String nama = res.getString("nama");
-                model.addRow(new Object[]{id, nama});
+                String cp = res.getString("cp");
+                String alamat = res.getString("alamat");
+                String telp = res.getString("telp");
+                String kota = res.getString("kota");
+                String fax = res.getString("fax");
+                String email = res.getString("email");
+                String jt = res.getString("jt");
+                float disc = res.getFloat("disc");
+                float awal = res.getFloat("AWAL");
+                float hutang = res.getFloat("Hutang");
+                float bayar = res.getFloat("Bayar");
+                float akhir = res.getFloat("Akhir");
+                String tgl = res.getString("tgl");
+                String userID = res.getString("userid");
+
+                model.addRow(new Object[]{id, nama, cp, alamat, telp, kota, fax, email, jt, disc, awal, hutang, bayar, akhir, tgl, userID});
             }
 
         } catch (Exception ex) {

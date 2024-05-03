@@ -5,8 +5,8 @@ import java.sql.*;
 public class Connection {
 
     private java.sql.Connection connection;
-    
-    private String databaseName = "latihandb";
+
+    private String databaseName = "crud_java";
     private String url = "jdbc:mysql://localhost:3306/";
     private String username = "root";
     private String password = "";
@@ -19,7 +19,7 @@ public class Connection {
         }
     }
 
-    public java.sql.Connection GetConnection(){
+    public java.sql.Connection GetConnection() {
         return connection;
     }
 }
