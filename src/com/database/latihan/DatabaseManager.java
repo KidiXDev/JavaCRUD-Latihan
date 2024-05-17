@@ -236,16 +236,13 @@ public class DatabaseManager extends SupplierModel {
 
             var stmt = conn.createStatement();
 
-            // Hitung jumlah total baris
             String countQuery = "SELECT COUNT(*) AS total FROM r_supplier";
             var countRes = stmt.executeQuery(countQuery);
             countRes.next();
             int totalRows = countRes.getInt("total");
 
-            // Hitung jumlah total halaman
             int totalPages = (int) Math.ceil((double) totalRows / limit);
 
-            // Jika halaman saat ini tidak melebihi jumlah total halaman, berarti ada halaman selanjutnya
             return page < totalPages;
 
         } catch (Exception ex) {
@@ -280,10 +277,8 @@ public class DatabaseManager extends SupplierModel {
             countRes.next();
             int totalRows = countRes.getInt("total");
 
-            // Hitung jumlah total halaman
             int totalPages = (int) Math.ceil((double) totalRows / limit);
 
-            // Jika halaman saat ini tidak melebihi jumlah total halaman, berarti ada halaman selanjutnya
             return page < totalPages;
 
         } catch (Exception ex) {
