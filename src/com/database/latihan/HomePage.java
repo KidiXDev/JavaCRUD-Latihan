@@ -2,6 +2,8 @@ package com.database.latihan;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.intellijthemes.FlatCobalt2IJTheme;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JDialog;
@@ -19,28 +21,36 @@ public class HomePage extends javax.swing.JFrame {
     private DefaultTableModel tableModel;
     private DatabaseManager dm;
 
+    private int currentPage = 1;
+
+    private void SearchUpdate() {
+        dm.FetchDatabaseSearchResult(tableModel, tfSearch.getText(), 1);
+        currentPage = 1;
+        tfPage.setText("1");
+    }
+
     public HomePage() {
         initComponents();
 
         dm = new DatabaseManager();
 
         tableModel = (DefaultTableModel) tableData.getModel();
-        new DatabaseManager().FetchDatabase(tableModel);
+        new DatabaseManager().FetchDatabase(tableModel, currentPage);
         tableData.setModel(tableModel);
 
         tableData.getTableHeader().setReorderingAllowed(false);
 
         tfSearch.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
-                dm.FetchDatabaseSearchResult(tableModel, tfSearch.getText());
+                SearchUpdate();
             }
 
             public void removeUpdate(DocumentEvent e) {
-                dm.FetchDatabaseSearchResult(tableModel, tfSearch.getText());
+                SearchUpdate();
             }
 
             public void insertUpdate(DocumentEvent e) {
-                dm.FetchDatabaseSearchResult(tableModel, tfSearch.getText());
+                SearchUpdate();
             }
         });
 
@@ -76,6 +86,16 @@ public class HomePage extends javax.swing.JFrame {
                 }
             }
         });
+
+        tfPage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (Integer.parseInt(tfPage.getText()) > 1) {
+                    currentPage = Integer.parseInt(tfPage.getText());
+                    dm.FetchDatabase(tableModel, currentPage);
+                }
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -92,6 +112,9 @@ public class HomePage extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tableData = new javax.swing.JTable();
         jSeparator1 = new javax.swing.JSeparator();
+        btnNext = new javax.swing.JButton();
+        btnPrev = new javax.swing.JButton();
+        tfPage = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -140,16 +163,14 @@ public class HomePage extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btnDelete)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnRefresh)
-                        .addGap(18, 18, 18)
-                        .addComponent(tfSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 622, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
-                        .addGap(273, 273, 273)))
+                .addComponent(btnRefresh)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 283, Short.MAX_VALUE)
+                .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(267, 267, 267)
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,24 +188,24 @@ public class HomePage extends javax.swing.JFrame {
 
         tableData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Nama", "CP", "Alamat", "Telp", "Kota", "Fax", "Email", "JT", "Disc", "AWAL", "Hutang", "Bayar", "Akhir", "Tgl", "User ID"
+                "ID", "Nama", "Alamat", "Telp", "Kota", "Email", "Bayar", "Tgl"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
+        tableData.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(tableData);
         if (tableData.getColumnModel().getColumnCount() > 0) {
-            tableData.getColumnModel().getColumn(0).setResizable(false);
             tableData.getColumnModel().getColumn(1).setResizable(false);
             tableData.getColumnModel().getColumn(2).setResizable(false);
             tableData.getColumnModel().getColumn(3).setResizable(false);
@@ -192,15 +213,29 @@ public class HomePage extends javax.swing.JFrame {
             tableData.getColumnModel().getColumn(5).setResizable(false);
             tableData.getColumnModel().getColumn(6).setResizable(false);
             tableData.getColumnModel().getColumn(7).setResizable(false);
-            tableData.getColumnModel().getColumn(8).setResizable(false);
-            tableData.getColumnModel().getColumn(9).setResizable(false);
-            tableData.getColumnModel().getColumn(10).setResizable(false);
-            tableData.getColumnModel().getColumn(11).setResizable(false);
-            tableData.getColumnModel().getColumn(12).setResizable(false);
-            tableData.getColumnModel().getColumn(13).setResizable(false);
-            tableData.getColumnModel().getColumn(14).setResizable(false);
-            tableData.getColumnModel().getColumn(15).setResizable(false);
         }
+
+        btnNext.setText(">>");
+        btnNext.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNextActionPerformed(evt);
+            }
+        });
+
+        btnPrev.setText("<<");
+        btnPrev.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrevActionPerformed(evt);
+            }
+        });
+
+        tfPage.setText("1");
+        tfPage.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        tfPage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfPageActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -213,6 +248,14 @@ public class HomePage extends javax.swing.JFrame {
                     .addComponent(jScrollPane1)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(8, 8, 8)
+                .addComponent(tfPage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,9 +264,14 @@ public class HomePage extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 584, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNext)
+                    .addComponent(btnPrev)
+                    .addComponent(tfPage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15))
         );
 
         pack();
@@ -234,7 +282,7 @@ public class HomePage extends javax.swing.JFrame {
         addDialog.setLocationRelativeTo(null);
         addDialog.setTitle("Tambah data baru");
         addDialog.show();
-        dm.FetchDatabase(tableModel);
+        dm.FetchDatabase(tableModel, currentPage);
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
@@ -246,8 +294,39 @@ public class HomePage extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        dm.FetchDatabase(tableModel);
+        dm.FetchDatabase(tableModel, currentPage);
     }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
+        if (tfSearch.equals("") && dm.hasNextPage(currentPage + 1)) {
+            currentPage++;
+            tfPage.setText(Integer.toString(currentPage));
+            dm.FetchDatabase(tableModel, currentPage);
+        } else if (dm.hasNextPageSearchResult(tfSearch.getText(), currentPage + 1)) {
+            currentPage++;
+            tfPage.setText(Integer.toString(currentPage));
+            dm.FetchDatabaseSearchResult(tableModel, tfSearch.getText(), currentPage);
+        }
+    }//GEN-LAST:event_btnNextActionPerformed
+
+    private void btnPrevActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrevActionPerformed
+        if (currentPage > 1 && tfSearch.equals("")) {
+            currentPage--;
+            tfPage.setText(Integer.toString(currentPage));
+            dm.FetchDatabase(tableModel, currentPage);
+        } else {
+            if (currentPage > 1) {
+                currentPage--;
+                tfPage.setText(Integer.toString(currentPage));
+                dm.FetchDatabaseSearchResult(tableModel, tfSearch.getText(), currentPage);
+            }
+
+        }
+    }//GEN-LAST:event_btnPrevActionPerformed
+
+    private void tfPageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfPageActionPerformed
+
+    }//GEN-LAST:event_tfPageActionPerformed
 
     public static void main(String args[]) {
         FlatLightLaf.setup();
@@ -282,7 +361,7 @@ public class HomePage extends javax.swing.JFrame {
         }
 
         dm.DeleteTable(tableModel, tableData);
-        dm.FetchDatabase(tableModel);
+        dm.FetchDatabase(tableModel, currentPage);
     }
 
     private void EditItem() {
@@ -297,19 +376,22 @@ public class HomePage extends javax.swing.JFrame {
         addDialog.setLocationRelativeTo(null);
         addDialog.setTitle("Edit data");
         addDialog.show();
-        dm.FetchDatabase(tableModel);
+        dm.FetchDatabase(tableModel, currentPage);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnNext;
+    private javax.swing.JButton btnPrev;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable tableData;
+    private javax.swing.JTextField tfPage;
     private javax.swing.JTextField tfSearch;
     // End of variables declaration//GEN-END:variables
 }
