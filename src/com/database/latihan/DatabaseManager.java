@@ -15,9 +15,10 @@ public class DatabaseManager extends SupplierModel {
         conn = koneksi.GetConnection();
     }
 
-    public void FetchDatabase(DefaultTableModel model, int page) {
-        int limit = 30;
+    public void FetchDatabase(DefaultTableModel model, int page, int limits, String sortOrder) {
+        int limit = limits;
         int offset = (page - 1) * limit;
+        String orderDirection = sortOrder.equals("Ascending") ? "ASC" : "DESC";
 
         try {
             var koneksi = new Connection();
@@ -25,7 +26,10 @@ public class DatabaseManager extends SupplierModel {
 
             var stmt = conn.createStatement();
 
-            String query = "SELECT id, nama, alamat, telp, kota, email, bayar, tgl FROM r_supplier LIMIT " + limit + " OFFSET " + offset;
+            String query = "SELECT id, nama, alamat, telp, kota, email, bayar, tgl FROM r_supplier "
+                    + "ORDER BY nama " + orderDirection
+                    + " LIMIT " + limit + " OFFSET " + offset;
+
             var res = stmt.executeQuery(query);
 
             if (res == null) {
@@ -154,9 +158,10 @@ public class DatabaseManager extends SupplierModel {
         }
     }
 
-    public void FetchDatabaseSearchResult(DefaultTableModel model, String searchTarget, int page) {
-        int limit = 30;
+    public void FetchDatabaseSearchResult(DefaultTableModel model, String searchTarget, int page, int limits, String sortOrder) {
+        int limit = limits;
         int offset = (page - 1) * limit;
+        String orderDirection = sortOrder.equals("Ascending") ? "ASC" : "DESC";
 
         try {
             var koneksi = new Connection();
@@ -170,7 +175,10 @@ public class DatabaseManager extends SupplierModel {
                     + "kota LIKE ? OR "
                     + "email LIKE ? OR "
                     + "Bayar LIKE ? OR "
-                    + "tgl LIKE ? LIMIT ? OFFSET ?";
+                    + "tgl LIKE ? "
+                    + "ORDER BY nama " + orderDirection + " "
+                    + "LIMIT ? OFFSET ?";
+
             PreparedStatement preparedStatement = conn.prepareStatement(query);
             String searchPattern = "%" + searchTarget + "%";
             for (int i = 1; i <= 8; i++) {
@@ -178,6 +186,7 @@ public class DatabaseManager extends SupplierModel {
             }
             preparedStatement.setInt(9, limit);
             preparedStatement.setInt(10, offset);
+
             ResultSet res = preparedStatement.executeQuery();
 
             if (res == null) {
@@ -226,8 +235,8 @@ public class DatabaseManager extends SupplierModel {
         return supplierModel;
     }
 
-    public boolean hasNextPage(int page) {
-        int limit = 30;
+    public boolean hasNextPage(int page, int limits) {
+        int limit = limits;
         int offset = (page - 1) * limit;
 
         try {
@@ -251,8 +260,8 @@ public class DatabaseManager extends SupplierModel {
         }
     }
 
-    public boolean hasNextPageSearchResult(String searchTarget, int page) {
-        int limit = 30;
+    public boolean hasNextPageSearchResult(String searchTarget, int page, int limits) {
+        int limit = limits;
         int offset = (page - 1) * limit;
 
         try {
