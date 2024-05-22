@@ -130,8 +130,8 @@ public class HomePage extends javax.swing.JFrame {
         comboBoxOrder.removeAllElements();
         comboBoxOrder.addElement("Ascending");
         comboBoxOrder.addElement("Descending");
-        comboBoxOrder.addElement("Id Asc");
-        comboBoxOrder.addElement("Id Desc");
+        //comboBoxOrder.addElement("Id Asc");
+        //comboBoxOrder.addElement("Id Desc");
 
         cbOrder.addActionListener(new ActionListener() {
             @Override
@@ -194,6 +194,8 @@ public class HomePage extends javax.swing.JFrame {
                 btnDeleteActionPerformed(evt);
             }
         });
+
+        tfSearch.setToolTipText("Type to search");
 
         btnRefresh.setText("REFRESH");
         btnRefresh.addActionListener(new java.awt.event.ActionListener() {
@@ -327,7 +329,6 @@ public class HomePage extends javax.swing.JFrame {
                             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbMaxPage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)

@@ -35,7 +35,6 @@
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cbMaxPage" min="-2" max="-2" attributes="0"/>
@@ -170,6 +169,9 @@
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="tfSearch">
+          <Properties>
+            <Property name="toolTipText" type="java.lang.String" value="Type to search"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="btnRefresh">
           <Properties>
