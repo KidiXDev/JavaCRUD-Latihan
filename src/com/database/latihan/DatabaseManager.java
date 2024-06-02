@@ -5,14 +5,40 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class DatabaseManager extends SupplierModel {
 
     java.sql.Connection conn;
 
+    public static int totalData;
+
     public DatabaseManager() {
         var koneksi = new Connection();
         conn = koneksi.GetConnection();
+    }
+
+    private void GetTotalData() {
+        try {
+            var koneksi = new Connection();
+            conn = koneksi.GetConnection();
+
+            var stmt = conn.createStatement();
+
+            String query = "SELECT COUNT(*) AS total FROM r_supplier";
+
+            var res = stmt.executeQuery(query);
+
+            if (res.next()) {
+                totalData = res.getInt("total");
+            } else {
+                throw new NullPointerException("Table not found or no rows!");
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void FetchDatabase(DefaultTableModel model, int page, int limits, String sortOrder) {
@@ -26,7 +52,7 @@ public class DatabaseManager extends SupplierModel {
 
             var stmt = conn.createStatement();
 
-            String query = "SELECT id, nama, alamat, telp, kota, email, bayar, tgl FROM r_supplier "
+            String query = "SELECT id, nama, alamat, telp, kota, email, bayar, tgl, disc, Akhir FROM r_supplier "
                     + "ORDER BY nama " + orderDirection
                     + " LIMIT " + limit + " OFFSET " + offset;
 
@@ -47,9 +73,19 @@ public class DatabaseManager extends SupplierModel {
                 String email = res.getString("email");
                 float bayar = res.getFloat("bayar");
                 String tgl = res.getString("tgl");
+                float disc = res.getFloat("disc");
+                float akhir = res.getFloat("Akhir");
 
-                model.addRow(new Object[]{id, nama, alamat, telp, kota, email, bayar, tgl});
+                // Parsing dan format ulang tanggal
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = originalFormat.parse(tgl);
+                String formattedDate = targetFormat.format(date);
+
+                model.addRow(new Object[]{id, nama, alamat, telp, kota, email, bayar, formattedDate, disc, akhir});
             }
+
+            GetTotalData();
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -80,7 +116,7 @@ public class DatabaseManager extends SupplierModel {
 
             SupplierModel supplierModel = createSupplierModelFromValues(values);
 
-            String query = "INSERT INTO r_supplier (id,nama,alamat,telp,kota,email,Bayar,tgl) VALUES (?,?,?,?,?,?,?,?)";
+            String query = "INSERT INTO r_supplier (id,nama,alamat,telp,kota,email,Bayar,tgl,disc,Akhir) VALUES (?,?,?,?,?,?,?,?,?,?)";
             PreparedStatement pstmt = conn.prepareStatement(query);
 
 //            for (int i = 0; i < values.length; i++) {
@@ -94,6 +130,8 @@ public class DatabaseManager extends SupplierModel {
             pstmt.setString(6, supplierModel.getEmail());
             pstmt.setObject(7, supplierModel.getBayar());
             pstmt.setObject(8, supplierModel.getTgl());
+            pstmt.setObject(9, supplierModel.getDisc());
+            pstmt.setObject(10, supplierModel.getAkhir());
 
             int rowsAffected = pstmt.executeUpdate();
 
@@ -111,7 +149,7 @@ public class DatabaseManager extends SupplierModel {
             var koneksi = new Connection();
             conn = koneksi.GetConnection();
 
-            String query = "UPDATE r_supplier SET id = ?, nama = ?, alamat = ?, telp = ?, kota = ?, email = ?, Bayar = ?, tgl = ? WHERE id = ?";
+            String query = "UPDATE r_supplier SET id = ?, nama = ?, alamat = ?, telp = ?, kota = ?, email = ?, Bayar = ?, tgl = ?, disc = ?, Akhir = ? WHERE id = ?";
             var pstmt = conn.prepareStatement(query);
 
             for (int i = 0; i < value.length; i++) {
@@ -132,7 +170,7 @@ public class DatabaseManager extends SupplierModel {
 
             var stmt = conn.createStatement();
 
-            String query = "SELECT id, nama, alamat, telp, kota, email, bayar, tgl FROM r_supplier WHERE id = '" + selectedID + "'";
+            String query = "SELECT id, nama, alamat, telp, kota, email, bayar, tgl, disc FROM r_supplier WHERE id = '" + selectedID + "'";
             var res = stmt.executeQuery(query);
 
             if (res == null) {
@@ -175,17 +213,19 @@ public class DatabaseManager extends SupplierModel {
                     + "kota LIKE ? OR "
                     + "email LIKE ? OR "
                     + "Bayar LIKE ? OR "
-                    + "tgl LIKE ? "
+                    + "tgl LIKE ? OR "
+                    + "disc LIKE ? OR "
+                    + "Akhir LIKE ? "
                     + "ORDER BY nama " + orderDirection + " "
                     + "LIMIT ? OFFSET ?";
 
             PreparedStatement preparedStatement = conn.prepareStatement(query);
             String searchPattern = "%" + searchTarget + "%";
-            for (int i = 1; i <= 8; i++) {
+            for (int i = 1; i <= 10; i++) {
                 preparedStatement.setString(i, searchPattern);
             }
-            preparedStatement.setInt(9, limit);
-            preparedStatement.setInt(10, offset);
+            preparedStatement.setInt(11, limit);
+            preparedStatement.setInt(12, offset);
 
             ResultSet res = preparedStatement.executeQuery();
 
@@ -204,8 +244,16 @@ public class DatabaseManager extends SupplierModel {
                 String email = res.getString("email");
                 float bayar = res.getFloat("Bayar");
                 String tgl = res.getString("tgl");
+                float disc = res.getFloat("disc");
+                float akhir = res.getFloat("Akhir");
 
-                model.addRow(new Object[]{id, nama, alamat, telp, kota, email, bayar, tgl});
+                // Parsing dan format ulang tanggal
+                SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = originalFormat.parse(tgl);
+                String formattedDate = targetFormat.format(date);
+
+                model.addRow(new Object[]{id, nama, alamat, telp, kota, email, bayar, formattedDate, disc, akhir});
             }
 
         } catch (Exception ex) {
@@ -231,6 +279,9 @@ public class DatabaseManager extends SupplierModel {
         } else {
             throw new IllegalArgumentException("Format tanggal tidak dikenal: " + values[7]);
         }
+
+        supplierModel.setDisc((Float) values[8]);
+        supplierModel.setAkhir((Float) values[9]);
 
         return supplierModel;
     }
@@ -276,10 +327,12 @@ public class DatabaseManager extends SupplierModel {
                     + "kota LIKE ? OR "
                     + "email LIKE ? OR "
                     + "Bayar LIKE ? OR "
-                    + "tgl LIKE ?";
+                    + "tgl LIKE ? OR "
+                    + "disc LIKE ? OR "
+                    + "Akhir LIKE ?";
             PreparedStatement preparedStatement = conn.prepareStatement(query);
             String searchPattern = "%" + searchTarget + "%";
-            for (int i = 1; i <= 8; i++) {
+            for (int i = 1; i <= 10; i++) {
                 preparedStatement.setString(i, searchPattern);
             }
             ResultSet countRes = preparedStatement.executeQuery();

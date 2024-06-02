@@ -38,6 +38,8 @@ public class AddMenuDialog extends javax.swing.JDialog {
         tfId = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
         tfTanggal = new com.github.lgooddatepicker.components.DatePicker();
+        tfDiskon = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -70,6 +72,8 @@ public class AddMenuDialog extends javax.swing.JDialog {
         jLabel13.setText("Tanggal:");
 
         jLabel16.setText("ID:");
+
+        jLabel8.setText("Diskon:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -116,9 +120,13 @@ public class AddMenuDialog extends javax.swing.JDialog {
                             .addComponent(tfId)
                             .addComponent(tfNama)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel13)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel13)
+                            .addComponent(jLabel8))
                         .addGap(18, 18, 18)
-                        .addComponent(tfTanggal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tfDiskon)
+                            .addComponent(tfTanggal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -156,6 +164,10 @@ public class AddMenuDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
                     .addComponent(tfTanggal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfDiskon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancel)
@@ -177,9 +189,11 @@ public class AddMenuDialog extends javax.swing.JDialog {
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = outputFormat.format(date);
 
+        float bayar = tfBayar.getText().isEmpty() ? 0 : Float.parseFloat(tfBayar.getText());
+        float diskon = tfDiskon.getText().isEmpty() ? 0 : Float.parseFloat(tfDiskon.getText());
+
         Object[] values = {tfId.getText(), tfNama.getText(), tfAlamat.getText(), tfTelp.getText(), tfKota.getText(), tfEmail.getText(),
-            tfBayar.getText().isEmpty() ? null : Float.parseFloat(tfBayar.getText()),
-            formattedDate};
+            bayar, formattedDate, diskon, SupplierModel.CalculateTotalPay(bayar, diskon)};
 
         for (int i = 0; i < values.length; i++) {
             if (values[i] instanceof String && ((String) values[i]).isEmpty()) {
@@ -201,8 +215,10 @@ public class AddMenuDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JTextField tfAlamat;
     private javax.swing.JTextField tfBayar;
+    private javax.swing.JTextField tfDiskon;
     private javax.swing.JTextField tfEmail;
     private javax.swing.JTextField tfId;
     private javax.swing.JTextField tfKota;

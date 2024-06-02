@@ -12,6 +12,8 @@ public class SupplierModel {
     private String email;
     private Float Bayar;
     private LocalDate tgl;
+    private Float disc;
+    private Float akhir;
 
     // Setter methods
     public void setId(String id) {
@@ -46,6 +48,14 @@ public class SupplierModel {
         this.tgl = Tgl;
     }
 
+    public void setDisc(Float Disc) {
+        this.disc = Disc;
+    }
+
+    public void setAkhir(Float Akhir) {
+        this.akhir = Akhir;
+    }
+
     // Getter methods
     public String getId() {
         return id;
@@ -77,5 +87,23 @@ public class SupplierModel {
 
     public LocalDate getTgl() {
         return tgl;
+    }
+
+    public Float getDisc() {
+        return disc;
+    }
+
+    public Float getAkhir() {
+        return akhir;
+    }
+
+    public static float CalculateTotalPay(float pay, float disc) {
+        if (disc < 1) {
+            // return harga asli pas tidak ada diskon
+            return pay;
+        }
+
+        float discValue = (disc / 100) * pay;
+        return pay - discValue;
     }
 }
